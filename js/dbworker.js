@@ -44,9 +44,12 @@
                         if (where) {
                             let key = Object.keys(where)[0];
                             let value = where[key];
-                            each(db.db.Projects, data => {
-                                data[key] === value && resolve([data]);
-                            });
+                            if (typeof value === "object" && value.in) {
+                                const values = value.in;
+                                resolve(db.db.Projects.filter(project => values.includes(project[key])));
+                            } else {
+                                resolve(db.db.Projects.filter(project => project[key] === value));
+                            }
                             resolve([null]);
                         } else resolve(db.db.Projects);
                     });
@@ -64,9 +67,10 @@
                 },
 
                 insert: function({ values }) {
+                    db.index += 1;
                     return new Promise(resolve => {
                         let data = values[0];
-                        data.id = ++db.index;
+                        data.id = db.index;
                         db.db.Projects.push(data);
                         resolve([{ id: data.id }]);
                     });

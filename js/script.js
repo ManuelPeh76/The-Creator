@@ -42,6 +42,7 @@ const root = window;
             "locales",					// -> locale
             "tag",						// -> tag, each
             "ace/ace",		            // -> ace
+            "ace/ext-language_tools",
             "ace/modes",                // -> ace
             "ace/themes",
             "ace/workers",
