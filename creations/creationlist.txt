@@ -1,0 +1,7 @@
+[
+  "/creations/json/CleanCSS.json",
+  "/creations/json/Game Of Life.json",
+  "/creations/json/JS Fuck.json",
+  "/creations/json/JS Fuck Decoder.json",
+  "/creations/json/Patternify Flex.json"
+]
