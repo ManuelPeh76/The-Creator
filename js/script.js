@@ -990,7 +990,7 @@ const root = window;
     }
 
     function enableAddToDbButton() {
-        show(".add-to-db-button");
+        show(".add_to_db_button");
     }
 
     async function getLocalCreations() {
