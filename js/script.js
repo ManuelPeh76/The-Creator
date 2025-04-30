@@ -142,7 +142,8 @@ const root = window;
                             { li: { class: "ui-state-project ui-corner-top project read_as_auto", onclick: toggleSaveAs, data: { title: Locale.titleSaveAs }, children: [{ a: { id: "read-as" }}]}},
                             { li: { class: "dummy-li", children: [{ a: { class: "dummy", id: "dummy", text: " " }}]}},
                             { li: { class: "ui-state-project ui-corner-top project open_extern", onclick: openExtern, data: { title: Locale.titleOpenExtern }, children: [{ a: { id: "open-extern" }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project autorun_project", onclick: () => render(), ondblclick: toggleAutoRender, data: { title: Locale.titleRun }, children: [{ a: { id: "run" }}]}}
+                            { li: { class: "ui-state-project ui-corner-top project add_to_db_button hide", onclick: () => addOfflineProjectsToDb(), data: { title: Locale.addOfflineProjectsToDb }, children: [{ a: { id: "add_to_db_button" }}]}},
+                            { li: { class: "ui-state-project ui-corner-top project autorun_project tab-right", onclick: () => render(), ondblclick: toggleAutoRender, data: { title: Locale.titleRun }, children: [{ a: { id: "run" }}]}}
                         ]}},
                         { div: {
                             id: "tabs-1", class: "tab", style: "display: contents", children: [
@@ -988,6 +989,10 @@ const root = window;
 
     }
 
+    function enableAddToDbButton() {
+        show(".add-to-db-button");
+    }
+
     async function getLocalCreations() {
         const projects = [];
         try {
@@ -1001,7 +1006,10 @@ const root = window;
                 each(chosenProjects, name => {
                     fetch("./creations/json/" + name + ".json").then(p => p.text()).then(project => {
                         pr.push(jsonParse(project));
-                        if (pr.length === chosenProjects.length) return processNewProjects(pr);
+                        if (pr.length === chosenProjects.length) {
+                            enableAddToDbButton();
+                            return processNewProjects(pr);
+                        }
                     });
                 });
             });
@@ -2305,6 +2313,9 @@ const root = window;
                 ) : name === "" ? resolve(1) : resolve(0)
             )
         });
+    }
+
+    function addOfflineProjectsToDb() {
     }
 
     function addToProjects(project = Project) {
