@@ -58,6 +58,7 @@ const root = window;
             addStyle(["style"]);
 
             eruda.init();
+            eruda.position({x: 10, y: innerHeight - 45});
 
             useDatabase = ["1", "true", undefined].includes(params.usedb) ? 1 : 0;
 
