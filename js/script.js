@@ -42,7 +42,6 @@ const root = window;
             "locales",					// -> locale
             "tag",						// -> tag, each
             "ace/ace",		            // -> ace
-            "ace/ext-language_tools",
             "ace/modes",                // -> ace
             "ace/themes",
             "ace/workers",
@@ -108,7 +107,13 @@ const root = window;
                 { input: { id: "file", type: "file", onchange: loadProject, class: "hide" }, parent: document.body },
                 { input: { id: "upload", type: "file", multiple: 1, onchange: upload, class: "hide" }, parent: document.body },
                 { div: { class: "work-container", children: [
-                    { h1: {}},
+                    { h1: { class: "orbitron", children: [
+                        { div: { class: "background-text", children: [
+                            { span: { class: "big", text: "C" }},
+                            { text: "reator" },
+                            { p: { class: "headline", text: "Run your project!" }}
+                        ]}}
+                    ]}},
                     { div: { id: "selection", class: "selection flex-space-between full-width", children: [
                         { select: { id: "locale-selection", class: "projects-selection locale-selection", onchange: switchLocale }},
                         { div: { id: "create-zip", class: "create-zip full-width"}}
@@ -142,8 +147,7 @@ const root = window;
                             { li: { class: "ui-state-project ui-corner-top project read_as_auto", onclick: toggleSaveAs, data: { title: Locale.titleSaveAs }, children: [{ a: { id: "read-as" }}]}},
                             { li: { class: "dummy-li", children: [{ a: { class: "dummy", id: "dummy", text: " " }}]}},
                             { li: { class: "ui-state-project ui-corner-top project open_extern", onclick: openExtern, data: { title: Locale.titleOpenExtern }, children: [{ a: { id: "open-extern" }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project add_to_db_button hide", onclick: () => addOfflineProjectsToDb(), data: { title: Locale.addOfflineProjectsToDb }, children: [{ a: { id: "add_to_db_button" }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project autorun_project tab-right", onclick: () => render(), ondblclick: toggleAutoRender, data: { title: Locale.titleRun }, children: [{ a: { id: "run" }}]}}
+                            { li: { class: "ui-state-project ui-corner-top project autorun_project", onclick: () => render(), ondblclick: toggleAutoRender, data: { title: Locale.titleRun }, children: [{ a: { id: "run" }}]}}
                         ]}},
                         { div: {
                             id: "tabs-1", class: "tab", style: "display: contents", children: [
@@ -320,6 +324,7 @@ const root = window;
             Toggler .addEventListener("click",          toggleConsole);
             window  .addEventListener("keydown",        handleFullscreen);
             window  .addEventListener("mousedown",      () => updateCursorPosition());
+
             each($$(".tab-button"), (button, index) => button.addEventListener("click", () => editors[index].focus()));
 
             WorkContainer.style.height = fullHeight;
@@ -989,10 +994,6 @@ const root = window;
 
     }
 
-    function enableAddToDbButton() {
-        show(".add_to_db_button");
-    }
-
     async function getLocalCreations() {
         const projects = [];
         try {
@@ -1006,10 +1007,7 @@ const root = window;
                 each(chosenProjects, name => {
                     fetch("./creations/json/" + name + ".json").then(p => p.text()).then(project => {
                         pr.push(jsonParse(project));
-                        if (pr.length === chosenProjects.length) {
-                            enableAddToDbButton();
-                            return processNewProjects(pr);
-                        }
+                        if (pr.length === chosenProjects.length) return processNewProjects(pr);
                     });
                 });
             });
@@ -1717,17 +1715,21 @@ const root = window;
             styles.push(...source.querySelectorAll("style"));
             const items = [...modules, ...scripts, ...styles, ...images];
             if (!items.length) resolve([source, 0]);
-            let url, replaceOrigin = u => {
+            let url, src, replaceOrigin = u => {
                 let url;
                 try {
                     url = new URL(u);
                 } catch(err) {
-                    if (u.startsWith("/")) {
+                    if (u.startsWith("/") && !u.startsWith("\/\/")) {
                         let p = path.split("/");
-                        while(p.length > 3) p.pop();console.log(p);
+                        while(p.length > 3) p.pop();
                         p = p[0] + "//" + p[2];
-                        return String(p + u);
-                    } else {
+                        let q = p.substring(0, p.indexOf("//"));
+                        p = p.substring(p.indexOf("//") + 2, p.length);
+                        p = p.replace(/\/\//g, "/");
+                        return String(q + p + u);
+                    } else if (u.startsWith("//")) return "https:" + u;
+                    else {
                         if (u.startsWith("./")) u = u.slice(1);
                         else u = "/" + u;
                         return String(path + u);
@@ -1737,19 +1739,21 @@ const root = window;
             };
             each(items, item => {
                 const tagName = item.tagName.toLowerCase();
-                let src;
                 promises.push(new Promise((resolve, reject) => {
                     tagName === "script" ? (
                         src = item.getAttribute("src"),
-                        src && src !== "" ? (
-                            url = replaceOrigin(src),
-                            item.type && item.type === "module" ?
-                            console.log("Downloading Module\n  item.src = " + item.src + "\n  replaceOrigin(item.src) = " + url) :
-                            console.log("Downloading Script\n  item.src = " + item.src + "\n  replaceOrigin(item.src) = " + url),
-                            fetch(url, header).then(c => c.text()).then(code => {
-                                resolve([item, (code.startsWith("<") ? "/* You need to insert the source code of '" + url + "' manually! */" : code)])
-                            })
-                        ) : (item.textContent || item.innerText) && resolve([item, item.textContent || item.innerText])
+                        src && ~src.indexOf("data:") ? resolve([item, src]) : (
+
+                            src && src !== "" ? (
+                                url = replaceOrigin(src),
+                                item.type && item.type === "module" ?
+                                console.log("Downloading Module\n  item.src = " + item.src + "\n  replaceOrigin(item.src) = " + url) :
+                                console.log("Downloading Script\n  item.src = " + item.src + "\n  replaceOrigin(item.src) = " + url),
+                                fetch(url, header).then(c => c.text()).then(code => {
+                                    resolve([item, (code.startsWith("<") ? "/* You need to insert the source code of '" + url + "' manually! */" : code)])
+                                })
+                            ) : (item.textContent || item.innerText) && resolve([item, item.textContent || item.innerText])
+                        )
                     ) : tagName === "link" ? (
                         url = replaceOrigin(item.getAttribute("href")),
                         console.log("Downloading Stylesheet\n  item.href = " + item.href + "\n  replaceOrigin(item.href) = " + url),
@@ -1764,9 +1768,12 @@ const root = window;
                         ) :
                         (item.textContent || item.innerText) && resolve([item, item.textContent || item.innerText])
                     ) : tagName === "img" && (
-                        url = replaceOrigin(item.getAttribute("src")),
-                        console.log("Downloading Image\n  item.src = " + item.src + "\n  replaceOrigin(item.src) = " + url),
-                        url && urlContentToDataUri(url).then(img => resolve([item, img]))
+                        src = item.getAttribute("src"),
+                        ~src.indexOf("data:") ? resolve([item, src]) : (
+                            url = replaceOrigin(src),
+                            console.log("Downloading Image from " + url),
+                            url && urlContentToDataUri(url).then(img => resolve([item, img]))
+                        )
                     );
                 }));
             });
@@ -2313,9 +2320,6 @@ const root = window;
                 ) : name === "" ? resolve(1) : resolve(0)
             )
         });
-    }
-
-    function addOfflineProjectsToDb() {
     }
 
     function addToProjects(project = Project) {
