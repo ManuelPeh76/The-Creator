@@ -36,12 +36,14 @@ const root = window;
      */
     addEventListener("load", function() {
         addScript([
-            "console",   				// -> console
+            //"console",   				// -> console
+            "https://cdnjs.cloudflare.com/ajax/libs/eruda/3.4.1/eruda.min",
             "jquery.1.12.4.min",		// -> jQuery, $
             "jquery.ui.custom",			// -> jQuery.tab
             "locales",					// -> locale
             "tag",						// -> tag, each
             "ace/ace",		            // -> ace
+            "ace/ext-language_tools",
             "ace/modes",                // -> ace
             "ace/themes",
             "ace/workers",
@@ -54,6 +56,8 @@ const root = window;
         ], function() {
 
             addStyle(["style"]);
+
+            eruda.init();
 
             useDatabase = ["1", "true", undefined].includes(params.usedb) ? 1 : 0;
 
@@ -247,7 +251,6 @@ const root = window;
             TitleButton     = _$("title-button");
             Upload          = _$("upload");
             WorkContainer   = $(".work-container");
-            Toggler         = $("c-toggler");
             DbState         = $(".db-state");
             DbInfo          = $(".db-info");
             ZipInfo         = _$("zip-info");
@@ -321,7 +324,6 @@ const root = window;
             document.addEventListener("contextmenu",     e => (global.lastRightClickElement = e.target, checkDisable(e.target)));
             root    .addEventListener("unload",         () => { Project.id && store.setItem("lastActiveProject", Project.id)});
             Sanitize.addEventListener("change",         () => Iframe.srcdoc = Sanitize.checked ? sanitize(replaceContent(createHtml(Project))) : replaceContent(createHtml(Project)));
-            Toggler .addEventListener("click",          toggleConsole);
             window  .addEventListener("keydown",        handleFullscreen);
             window  .addEventListener("mousedown",      () => updateCursorPosition());
 
@@ -720,7 +722,7 @@ const root = window;
             const el = global.activeElement;
             e.preventDefault();
             e.stopPropagation();
-            toggleFullscreen(el === Iframe || Iframe.contentDocument.contains(el) ? Iframe : el === console.container || console.container.contains(el) ? console.container : _$("tabs"));
+            toggleFullscreen(el === Iframe || Iframe.contentDocument.contains(el) ? Iframe : /*el === console.container || console.container.contains(el) ? console.container :*/ _$("tabs"));
         }
     }
 
@@ -754,7 +756,7 @@ const root = window;
     }
 
     function toggleConsole(e)  {
-        if (document.querySelector("c-toggler").classList.contains("is-moving") || WorkContainer.classList.contains("blur")) return;
+        if (WorkContainer.classList.contains("blur")) return;
         WorkContainer.style.height = WorkContainer.style.height === fullHeight ? reducedHeight : fullHeight;
         setTimeout(() => each(editors, editor => editor.resize()), 400);
     }
@@ -1164,7 +1166,7 @@ const root = window;
         add.constructor === String && (add = add.startsWith("javascript:") ? add.replace(/^javascript:\s+/, "") : [add]);
         script = document.createElement("script");
         script.defer = 1;
-        typeof add === "string" ? script.textContent = add : script.src = "js/" + add.splice(0,1)[0] + ".js";
+        typeof add === "string" ? script.textContent = add : script.src = (add[0].startsWith("http") ? "" : "js/") + add.splice(0,1)[0] + ".js";
         temp.add.push(script);
         script.onload = add.length ? () => addScript(add, callback) : () => {
             while(temp.add.length) temp.add.splice(0,1)[0].onload = null;
@@ -1400,36 +1402,11 @@ const root = window;
     }
 
     function iFrameOnLoad(){
-        console.info("\nNew Session\n\n");
-        console.setRoot && console.setRoot(Iframe.contentWindow); // Set the console as default console for the iframe
         Idoc = Iframe.contentDocument;
         Iwin = Iframe.contentWindow;
 
         Iwin.onkeydown = function(e) {
             handleFullscreen.call(this, e);
-        };
-
-        Iwin.onerror = function(msg, file, line, col, error) {
-                msg = msg + (file ? " in " + file : "") + (line ? " in line " + line + (col ? ":" + col : "") : "");
-                if (file && line && col) {
-                    const scripts = [...Idoc.scripts];
-                    const pattern = "/*-" + file + "-*/";
-                    for(let i = 0; i < scripts.length; i++) {
-                        const script = scripts[i];
-                        if (!script.innerText || script.innerText.indexOf(pattern) === -1) continue;
-                        let text = script.innerText;
-                        const start = text.indexOf(pattern);
-                        let end = text.indexOf("/*-", start);
-                        if (!~end) end = text.length;
-                        text = text.substring(start, end).split("\n")[line - 1];
-                        text = text.substring(0, col) + "%c" + text.substring(col);
-                        msg += "\n" + text;
-                        break;
-                    }
-                }
-                const css = "color: #ff5454; font-weight: bold;";
-                console.error(msg, css);
-                return true;
         };
 
         // Allows to copy texts inside the iframe using the custom contextmenu
@@ -2539,12 +2516,12 @@ const root = window;
     }
 
     function blurContainer() {
-        const container = [ WorkContainer, Container, Toggler ];
+        const container = [ WorkContainer, Container ];
         each(container, c => c.classList.add("blur"));
     }
 
     function unblurContainer() {
-        const container = [ WorkContainer, Container, Toggler ];
+        const container = [ WorkContainer, Container ];
         each(container, c => c.classList.remove("blur"));
     }
 
