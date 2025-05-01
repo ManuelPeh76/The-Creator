@@ -66,6 +66,21 @@ input,select{vertical-align:middle}
     font-family: Orbitron;
 }
 
+@font-face {
+    src: url("/css/fonts/Taurus-Mono-Outline-Regular.otf") format("opentype");
+    font-family: "Taurus Mono Outline";
+    font-weight: 400;
+}
+
+@font-face {
+    src: url("/css/fonts/Taurus-Mono-Outline-Bold.otf") format("opentype");
+    font-family: "Taurus Mono Outline";
+    font-weight: 700;
+}
+
+.taurus {
+    font-family: "Taurus Mono Outline";
+}
 * {
     scrollbar-width: auto;
     /* auto | thin | none */
