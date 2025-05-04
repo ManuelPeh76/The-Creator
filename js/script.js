@@ -79,25 +79,25 @@ const root = window;
                 [Locale.project, "menu-project", [
                     [Locale.newProject, "new_file", "", Locale.titleStartNewProject, createProject, "n"],
                     [ Locale.saveProject, "save_project", "", Locale.titleSaveProject, saveProject, "s" ],
-                    [ Locale.loadProject, "load_project", "", Locale.titleLoadProject, function () { _$("file").click(); } ],
+                    [ Locale.loadProject, "load_project", "", Locale.titleLoadProject, function () { $_("file").click(); } ],
+                    [ Locale.removeProject, "delete_project", "", Locale.titleRemoveProjectFromDatabase, removeProject ],
                     [ Locale.emptyThisProject, "reset", "", Locale.titleReset, reset, "r" ],
                     [ Locale.downloadAsHtml, "download_html", "", Locale.titleDownloadAsHtml, download, "d" ]
                 ]],
-                [Locale.database, "menu-storage", [
-                    [ Locale.removeProjectFromDatabase, "delete_project", "", Locale.titleRemoveProjectFromDatabase, removeProject, "x" ],
-                    [ Locale.saveDatabaseAsZip, "save_storage", "", Locale.titleSaveDatabaseAsZip, saveStorage, "y" ]
-                ]],
+                [ Locale.saveDatabaseAsZip, "save_storage", "", Locale.titleSaveDatabaseAsZip, saveStorage, "y" ],
                 ["separator"],
                 ["Ace Editor", "menu-ace", [
                     [ Locale.showKeyboardShortcuts, "show-keyboard-shortcuts", "", "", () => aceShow("keyboardShortcuts"), "k" ],
                     [ Locale.showSettingsMenu, "show-settings-menu", "", "", () => aceShow("settingsMenu"), "s" ],
                     [ Locale.openCommandPallete, "open-command-pallete", "", "", () => aceShow("commandPallete"), "p" ],
                     [ Locale.enableAutocompletion, "enable-autocompletion", "", "", enableAutocompletion ],
-                    [ Locale.disableAutocompletion, "disable-autocompletion", "", "", disableAutocompletion ]
+                    [ Locale.disableAutocompletion, "disable-autocompletion", "", "", disableAutocompletion ],
+                    [ Locale.titleReplaceButton, "replace", "", "", () => editors[[...$$(".tabs-headers li")].indexOf($(".ui-state-active"))].execCommand("replace"), "f" ]
+
                 ]],
                 ["separator"],
                 [Locale.getWebsite, "download_from_url", "", Locale.titleGetWebsite, downloadFromUrl, "u"],
-                [Locale.uploadFile, "upload_files", "", Locale.titleUploadFile, function () { _$("upload").click(); } ],
+                [Locale.uploadFile, "upload_files", "", Locale.titleUploadFile, function () { $_("upload").click(); } ],
                 ["separator"],
                 [Locale.selectAll, "text_select_all", "", "", () => copyAndPaste("selectAll")],
                 [Locale.cut, "text_cut", "", "", () => copyAndPaste("cut")],
@@ -111,122 +111,121 @@ const root = window;
             tag(
                 { input: { id: "file", type: "file", onchange: loadProject, class: "hide" }, parent: document.body },
                 { input: { id: "upload", type: "file", multiple: 1, onchange: upload, class: "hide" }, parent: document.body },
-                { div: { class: "work-container", children: [
-                    { h1: { class: "orbitron", children: [
-                        { div: { class: "background-text", children: [
-                            { span: { class: "big", text: "C" }},
-                            { text: "reator" },
-                            { p: { class: "headline", text: "Run your project!" }}
+                { div: { class: "main-wrapper", children: [
+                    { header: { children: [
+                        { div: { id: "selection", class: "selection flex-space-between full-width", children: [
+                            { select: { id: "locale-selection", class: "projects-selection locale-selection", onchange: switchLocale }},
+                            { div: { id: "create-zip", class: "create-zip full-width"}}
+                        ]}},
+                        { h1: { children: [{ img: { src: "img/bg.png" }}]}},
+                        
+                        { div: { class: "title-header", children: [
+                            { span: { class: "right", text: Locale.project + ":" }},
+                            { div: { onclick: focusTitle, id: "title", class: "title", title: Locale.clickToChange, style: { cursor: "pointer" }, text: Locale.unnamedProject }},
+                            { span: { style: { float: "right", paddingRight: "20px", position: "relative" }, children: [{ button: { id: "title-button", class: "title-button hide", text: Locale.saveName, onclick: changeTitle }}]}}
                         ]}}
                     ]}},
-                    { div: { id: "selection", class: "selection flex-space-between full-width", children: [
-                        { select: { id: "locale-selection", class: "projects-selection locale-selection", onchange: switchLocale }},
-                        { div: { id: "create-zip", class: "create-zip full-width"}}
-                    ]}},
-                    { div: { class: "title-header", children: [
-                        { span: { class: "right", text: Locale.project + ":" }},
-                        { div: { onclick: focusTitle, id: "title", class: "title", title: Locale.clickToChange, style: { cursor: "pointer" }, text: Locale.unnamedProject }},
-                        { span: { style: { float: "right", paddingRight: "20px", position: "relative" }, children: [{ button: { id: "title-button", class: "title-button hide", text: Locale.saveName, onclick: changeTitle }}]}}
-                    ]}},
-                    { div: { id: "tabs", class: "tabs", children: [
-                        { ul: { class: "tabs-headers", children: [
-                            { li: { onclick: clickTabHeader, data: { type: "html" }, children: [{ a: { text: "HTML", class: "tab-button", id: "tab-html", data: { title: "HTML5" }, href: "#tabs-1" }}]}},
-                            { li: { onclick: clickTabHeader, data: { type: "js" }, children: [{ a: { text: "JS", class: "tab-button", id: "tab-js", data: { title: "Javascript" }, href: "#tabs-2" }}]}},
-                            { li: { onclick: clickTabHeader, data: { type: "ts" }, children: [{ a: { text: "TS", class: "tab-button", id: "tab-ts", data: { title: "Typescript" }, href: "#tabs-3" }}]}},
-                            { li: { onclick: clickTabHeader, data: { type: "css" }, children: [{ a: { text: "CSS", class: "tab-button", id: "tab-css", data: { title: "CSS3" }, href: "#tabs-4" }}]}},
-                            { li: { onclick: clickTabHeader, data: { type: "images" }, children: [{ a: { class: "tab-button", id: "tab-images", data: { title: Locale.images }, href: "#tabs-5", text: Locale.images }}]}},
-                            { li: { onclick: clickTabHeader, data: { type: "assets" }, children: [{ a: { class: "tab-button", id: "tab-assets", data: { title: "Assets" }, href: "#tabs-6", text: Locale.assets }}]}},
-                            { li: { class: "dummy-li", children: [{ a: { class: "dummy", id: "dummy" }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project save_project", onclick: saveProject, data: { title: Locale.titleSaveProject }, children: [{ a: { id: "download-project" }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project load_project", onclick: function() {_$("file").click();}, data: { title: Locale.titleLoadProject }, children: [{ a: { id: "upload-project" }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project delete_project", onclick: removeProject, data: { title: Locale.titleRemoveProjectFromDatabase }, children: [{ a: { id: "remove-project" }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project save_storage", onclick: () => saveStorage(), data: { title: Locale.titleSaveDatabaseAsZip }, children: [{ a: { id: "download-storage" }}]}},
-                            { li: { class: "dummy-li", children: [{ a: { class: "dummy", id: "dummy", text: " " }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project new_file", onclick: createProject, data: { title: Locale.titleStartNewProject }, children: [{ a: { id: "new-project" }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project reset", onclick: reset, data: { title: Locale.titleReset }, children: [{ a: { id: "reset" }}]}},
-                            { li: { class: "dummy-li", children: [{ a: { class: "dummy", id: "dummy", text: " " }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project download_html", onclick: download, data: { title: Locale.titleDownloadAsHtml }, children: [{ a: { id: "download" }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project download_from_url", onclick: downloadFromUrl, data: { title: Locale.titleGetWebsite }, children: [{ a: { id: "download-from-url" }}]}},
-                            { li: { class: "dummy-li", children: [{ a: { class: "dummy", id: "dummy", text: " " }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project upload_files", onclick: () => _$("upload").click(), data: { title: Locale.titleUploadFile }, children: [{ a: { id: "uupload" }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project read_as_auto", onclick: toggleSaveAs, data: { title: Locale.titleSaveAs }, children: [{ a: { id: "read-as" }}]}},
-                            { li: { class: "dummy-li", children: [{ a: { class: "dummy", id: "dummy", text: " " }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project open_extern", onclick: openExtern, data: { title: Locale.titleOpenExtern }, children: [{ a: { id: "open-extern" }}]}},
-                            { li: { class: "ui-state-project ui-corner-top project autorun_project", onclick: () => render(), ondblclick: toggleAutoRender, data: { title: Locale.titleRun }, children: [{ a: { id: "run" }}]}}
+                    { div: { class: "work-container", children: [
+                        { div: { id: "tabs", class: "tabs", children: [
+                            { ul: { class: "tabs-headers", children: [
+                                { li: { onclick: clickTabHeader, data: { type: "html" }, children: [{ a: { text: "HTML", class: "tab-button", id: "tab-html", data: { title: "HTML5" }, href: "#tabs-1" }}]}},
+                                { li: { onclick: clickTabHeader, data: { type: "js" }, children: [{ a: { text: "JS", class: "tab-button", id: "tab-js", data: { title: "Javascript" }, href: "#tabs-2" }}]}},
+                                { li: { onclick: clickTabHeader, data: { type: "ts" }, children: [{ a: { text: "TS", class: "tab-button", id: "tab-ts", data: { title: "Typescript" }, href: "#tabs-3" }}]}},
+                                { li: { onclick: clickTabHeader, data: { type: "css" }, children: [{ a: { text: "CSS", class: "tab-button", id: "tab-css", data: { title: "CSS3" }, href: "#tabs-4" }}]}},
+                                { li: { onclick: clickTabHeader, data: { type: "images" }, children: [{ a: { class: "tab-button", id: "tab-images", data: { title: Locale.images }, href: "#tabs-5", text: Locale.images }}]}},
+                                { li: { onclick: clickTabHeader, data: { type: "assets" }, children: [{ a: { class: "tab-button", id: "tab-assets", data: { title: "Assets" }, href: "#tabs-6", text: Locale.assets }}]}},
+                                { li: { class: "dummy-li", children: [{ a: { class: "dummy", id: "dummy" }}]}},
+                                { li: { class: "ui-state-project ui-corner-top project save_project", onclick: saveProject, data: { title: Locale.titleSaveProject }, children: [{ a: { id: "download-project" }}]}},
+                                { li: { class: "ui-state-project ui-corner-top project load_project", onclick: function() {$_("file").click();}, data: { title: Locale.titleLoadProject }, children: [{ a: { id: "upload-project" }}]}},
+                                { li: { class: "ui-state-project ui-corner-top project delete_project", onclick: removeProject, data: { title: Locale.titleRemoveProjectFromDatabase }, children: [{ a: { id: "remove-project" }}]}},
+                                { li: { class: "ui-state-project ui-corner-top project save_storage", onclick: () => saveStorage(), data: { title: Locale.titleSaveDatabaseAsZip }, children: [{ a: { id: "download-storage" }}]}},
+                                { li: { class: "dummy-li", children: [{ a: { class: "dummy", id: "dummy", text: " " }}]}},
+                                { li: { class: "ui-state-project ui-corner-top project new_file", onclick: createProject, data: { title: Locale.titleStartNewProject }, children: [{ a: { id: "new-project" }}]}},
+                                { li: { class: "ui-state-project ui-corner-top project reset", onclick: reset, data: { title: Locale.titleReset }, children: [{ a: { id: "reset" }}]}},
+                                { li: { class: "dummy-li", children: [{ a: { class: "dummy", id: "dummy", text: " " }}]}},
+                                { li: { class: "ui-state-project ui-corner-top project download_html", onclick: download, data: { title: Locale.titleDownloadAsHtml }, children: [{ a: { id: "download" }}]}},
+                                { li: { class: "ui-state-project ui-corner-top project download_from_url", onclick: downloadFromUrl, data: { title: Locale.titleGetWebsite }, children: [{ a: { id: "download-from-url" }}]}},
+                                { li: { class: "dummy-li", children: [{ a: { class: "dummy", id: "dummy", text: " " }}]}},
+                                { li: { class: "ui-state-project ui-corner-top project upload_files", onclick: () => $_("upload").click(), data: { title: Locale.titleUploadFile }, children: [{ a: { id: "uupload" }}]}},
+                                { li: { class: "ui-state-project ui-corner-top project read_as_auto", onclick: toggleSaveAs, data: { title: Locale.titleSaveAs }, children: [{ a: { id: "read-as" }}]}},
+                                { li: { class: "dummy-li", children: [{ a: { class: "dummy", id: "dummy", text: " " }}]}},
+                                { li: { class: "ui-state-project ui-corner-top project open_extern", onclick: openExtern, data: { title: Locale.titleOpenExtern }, children: [{ a: { id: "open-extern" }}]}},
+                                { li: { class: "ui-state-project ui-corner-top project autorun_project", onclick: () => render(), ondblclick: toggleAutoRender, data: { title: Locale.titleRun }, children: [{ a: { id: "run" }}]}}
+                            ]}},
+                            { div: {
+                                id: "tabs-1", class: "tab", style: "display: contents", children: [
+                                    { div: { class: "tools-container ace-cobalt border-bottom flex-space-between full-width", children: [
+                                        { span: { class: "tools-info" }},
+                                        { span: { id: "html_tools" }}
+                                    ]}},
+                                    { div: { class: "editor html", data: { mode: "html", id: "html_" }}}
+                                ]
+                            }},
+                            { div: {
+                                id: "tabs-2", class: "tab", style: "display: contents", children: [
+                                    { div: { class: "tools-container ace-cobalt border-bottom flex-space-between", children: [
+                                        { span: { class: "tools-info" }},
+                                        { span: { id: "js_tools" }}
+                                    ]}},
+                                    { div: { class: "editor js", data: { mode: "javascript", id: "js_" }}}
+                                ]
+                            }},
+                            { div: {
+                                id: "tabs-3", class: "tab", style: "display: contents", children: [
+                                    { div: { class: "tools-container ace-cobalt border-bottom flex-space-between", children: [
+                                        { span: { class: "tools-info" }},
+                                        { span: { id: "ts_tools" }}
+                                    ]}},
+                                    { div: { class: "editor ts", data: { mode: "typescript", id: "ts_" }}}
+                                ]
+                            }},
+                            { div: {
+                                id: "tabs-4", class: "tab", style: "display: contents", children: [
+                                    { div: { class: "tools-container ace-cobalt border-bottom flex-space-between", children: [
+                                        { span: { class: "tools-info" }},
+                                        { span: { id: "css_tools" }}
+                                    ]}},
+                                    { div: { class: "editor css", data: { mode: "css", id: "css_" }}}
+                                ]
+                            }},
+                            { div: {
+                                id: "tabs-5", class: "tab", style: "display: contents", children: [
+                                    { div: { class: "tools-container ace-cobalt border-bottom flex-space-between", children: [
+                                        { span: { class: "tools-info" }},
+                                        { span: { id: "images_tools" }}
+                                    ]}},
+                                    { div: { class: "editor images", data: { mode: "json", id: "images_" }}}
+                                ]
+                            }},
+                            { div: {
+                                id: "tabs-6", class: "tab", style: "display: contents", children: [
+                                    { div: { class: "tools-container ace-cobalt border-bottom flex-space-between", children: [
+                                        { span: { class: "tools-info" }},
+                                        { span: { id: "assets_tools" }}
+                                    ]}},
+                                    { div: { class: "editor assets", data: { mode: "json", id: "assets_" }}}
+                                ]
+                            }},
+                            { div: {
+                                id: "info", class: "infoline ace-cobalt border-top flex-space-between full-width", children: [
+                                    { div: { id: "editor-info", class: "editor-info" }},
+                                    { div: { id: "overall-size", class: "overall-size" }},
+                                    { div: { id: "db-line", class: "db-line", onclick: showDatabaseEntries, children: [{ span: {class: "db-state", data: { title: Locale.databaseBusyExplanation }}}, { div: { class: "db-info", data: { title: Locale.showDatabaseEntries } }}]}}
+                                ]
+                            }},
+                            { div: { class: "cursor-position ace-cobalt full-width", children: [
+                                { span: { class: "row", text: "1" }},
+                                { span: { class: "column", text: "1" }}
+                            ]}}
                         ]}},
-                        { div: {
-                            id: "tabs-1", class: "tab", style: "display: contents", children: [
-                                { div: { class: "tools-container ace-cobalt border-bottom flex-space-between full-width", children: [
-                                    { span: { class: "tools-info" }},
-                                    { span: { id: "html_tools" }}
-                                ]}},
-                                { div: { class: "editor html", data: { mode: "html", id: "html_" }}}
-                            ]
-                        }},
-                        { div: {
-                            id: "tabs-2", class: "tab", style: "display: contents", children: [
-                                { div: { class: "tools-container ace-cobalt border-bottom flex-space-between", children: [
-                                    { span: { class: "tools-info" }},
-                                    { span: { id: "js_tools" }}
-                                ]}},
-                                { div: { class: "editor js", data: { mode: "javascript", id: "js_" }}}
-                            ]
-                        }},
-                        { div: {
-                            id: "tabs-3", class: "tab", style: "display: contents", children: [
-                                { div: { class: "tools-container ace-cobalt border-bottom flex-space-between", children: [
-                                    { span: { class: "tools-info" }},
-                                    { span: { id: "ts_tools" }}
-                                ]}},
-                                { div: { class: "editor ts", data: { mode: "typescript", id: "ts_" }}}
-                            ]
-                        }},
-                        { div: {
-                            id: "tabs-4", class: "tab", style: "display: contents", children: [
-                                { div: { class: "tools-container ace-cobalt border-bottom flex-space-between", children: [
-                                    { span: { class: "tools-info" }},
-                                    { span: { id: "css_tools" }}
-                                ]}},
-                                { div: { class: "editor css", data: { mode: "css", id: "css_" }}}
-                            ]
-                        }},
-                        { div: {
-                            id: "tabs-5", class: "tab", style: "display: contents", children: [
-                                { div: { class: "tools-container ace-cobalt border-bottom flex-space-between", children: [
-                                    { span: { class: "tools-info" }},
-                                    { span: { id: "images_tools" }}
-                                ]}},
-                                { div: { class: "editor images", data: { mode: "json", id: "images_" }}}
-                            ]
-                        }},
-                        { div: {
-                            id: "tabs-6", class: "tab", style: "display: contents", children: [
-                                { div: { class: "tools-container ace-cobalt border-bottom flex-space-between", children: [
-                                    { span: { class: "tools-info" }},
-                                    { span: { id: "assets_tools" }}
-                                ]}},
-                                { div: { class: "editor assets", data: { mode: "json", id: "assets_" }}}
-                            ]
-                        }},
-                        { div: {
-                            id: "info", class: "infoline ace-cobalt border-top flex-space-between full-width", children: [
-                                { div: { id: "editor-info", class: "editor-info" }},
-                                { div: { id: "overall-size", class: "overall-size" }},
-                                { div: { id: "db-line", class: "db-line", onclick: showDatabaseEntries, children: [{ span: {class: "db-state", data: { title: Locale.databaseBusyExplanation }}}, { div: { class: "db-info", data: { title: Locale.showDatabaseEntries } }}]}}
-                            ]
-                        }},
-                        { div: { class: "cursor-position ace-cobalt full-width", children: [
-                            { span: { class: "row", text: "1" }},
-                            { span: { class: "column", text: "1" }}
+                        { div: { class: "flex-space-between", children: [
+                            { div: { id: "sanitize-info", class: "sanitize-info", children: [
+                                { input: { type: "checkbox", id: "sanitize" }},
+                                { label: { class: "sanitize-label", htmlFor: "sanitize", text: Locale.preventPotientiallyHarmfulContentFromRunning }}
+                            ]}},
+                            { div: { id: "project-info", class: "project-info" }}
                         ]}}
                     ]}},
-                    { div: { class: "flex-space-between", children: [
-                        { div: { id: "sanitize-info", class: "sanitize-info", children: [
-                            { input: { type: "checkbox", id: "sanitize" }},
-                            { label: { class: "sanitize-label", htmlFor: "sanitize", text: Locale.preventPotientiallyHarmfulContentFromRunning }}
-                        ]}},
-                        { div: { id: "project-info", class: "project-info" }}
-                    ]}}
                 ]}, parent: document.body },
                 { div: { id: "zip-info", class: "zip-info hide" }, parent: document.body },
                 { div: { id: "zip-info-container", class: "zip-info-container hide" }, parent: document.body },
@@ -235,27 +234,27 @@ const root = window;
 
             ColumnDisplay   = $(".column");
             RowDisplay      = $(".row");
-            Container       = _$("container");
-            Download        = _$("download");
-            DownloadProject = _$("download-project");
-            EditorInfo      = _$("editor-info");
-            Files           = _$("file");
-            LocaleDiv       = _$("locale-selection");
-            OverallSize     = _$("overall-size");
-            RemoveProject   = _$("remove-project");
-            Reset           = _$("reset");
-            Run             = _$("run");
-            Sanitize        = _$("sanitize");
-            SaveStorage     = _$("download-storage");
-            SelectContainer = _$("selection");
-            Title           = _$("title");
-            TitleButton     = _$("title-button");
-            Upload          = _$("upload");
+            Container       = $_("container");
+            Download        = $_("download");
+            DownloadProject = $_("download-project");
+            EditorInfo      = $_("editor-info");
+            Files           = $_("file");
+            LocaleDiv       = $_("locale-selection");
+            OverallSize     = $_("overall-size");
+            RemoveProject   = $_("remove-project");
+            Reset           = $_("reset");
+            Run             = $_("run");
+            Sanitize        = $_("sanitize");
+            SaveStorage     = $_("download-storage");
+            SelectContainer = $_("selection");
+            Title           = $_("title");
+            TitleButton     = $_("title-button");
+            Upload          = $_("upload");
             WorkContainer   = $(".work-container");
             DbState         = $(".db-state");
             DbInfo          = $(".db-info");
-            ZipInfo         = _$("zip-info");
-            ZipInfoContainer = _$("zip-info-container");
+            ZipInfo         = $_("zip-info");
+            ZipInfoContainer = $_("zip-info-container");
 
             // Animate the database info line on startup
             function startupDatabaseInfo() {
@@ -329,6 +328,7 @@ const root = window;
             window  .addEventListener("mousedown",      () => updateCursorPosition());
 
             each($$(".tab-button"), (button, index) => button.addEventListener("click", () => editors[index].focus()));
+            eruda["_$el"][0].children[1].addEventListener("click", toggleConsole);
 
             WorkContainer.style.height = fullHeight;
 
@@ -583,8 +583,8 @@ const root = window;
     const databaseTable         = [];
     const editorTools           = {};
     const temp                  = {};
-    const fullHeight            = "99vh";
-    const reducedHeight         = "84vh";
+    const fullHeight            = "75vh";
+    const reducedHeight         = "43vh";
     const params                = Object.fromEntries(new URLSearchParams(window.location.search).entries())
     const worker                = new Worker("./js/dbworker.js");
     const scriptStore           = { store: {}, getItem(item) { return this.store[item]; }, setItem: function(item, value) { return this.store[item] = value; }, removeItem: function(item) { return delete this.store[item]; }};
@@ -595,7 +595,7 @@ const root = window;
 
     const $                     = element => document.querySelector(element);
     const $$                    = element => document.querySelectorAll(element);
-    const _$                    = element => document.getElementById(element);
+    const $_                    = element => document.getElementById(element);
 
     const clone                 = (obj, type = {}) => extend(type, obj);
     const showWaitForZipMsg     = () => showInfo(ZipInfo, Locale.waitForZipCreationToFinish, 1);
@@ -624,7 +624,7 @@ const root = window;
      */
     let cMenu, contextMenu, databaseDisplayTimeout, databaseInfo, int, lastActiveProject, store, useDatabase,
         ColumnDisplay, Container, DbState, Download, DownloadProject, EditorInfo, Files, Idoc, Iframe, Iwin, Locale, LocaleDiv, OverallSize, Project, Projects = [], Remove, Reset, RowDisplay, Run, Sanitize, SaveStorage, Select, SelectContainer, Upload, WorkContainer, Zip, ZipInfo, ZipInfoContainer,
-        global = { activeElement: null, autorendering: 1, rememberChoice: 0, chosen: "", downloadScriptsAndStyles: 0, editorTimeout: 0, backup: {}, renderDelay: 0, interval: 0, interval2: 0, dots: 0, dots2: 0, preventRendering: 0, removeComments: 0, lastRightClickElement: null, logTime: Date.now(), readAs: "auto"},
+        global = { activeElement: null, autorendering: 1, rememberChoice: 0, chosen: "", downloadScriptsAndStyles: 0, editorTimeout: 0, backup: {}, renderDelay: 0, interval: 0, contextmenu_interval: 0, dots: 0, dots2: 0, preventRendering: 0, removeComments: 0, lastRightClickElement: null, logTime: Date.now(), readAs: "auto"},
         _head = `<${"!DOCTYPE html"}><${"html lang='en'"}><${"head"}>`,
         _css = `<${"style id='css_by_creator'"}>`,
         _css0 = `<${"/style"}>`,
@@ -653,7 +653,7 @@ const root = window;
             closeInfo()
         ) : (
             global.backup.readAs = global.readAs,
-            global.readAs_Parent = _$("read-as").parentElement,
+            global.readAs_Parent = $_("read-as").parentElement,
             showForm(Locale.upload, Locale.uploadFilesAs, [[{
                 type: "radio",
                 name: "read-as",
@@ -723,7 +723,7 @@ const root = window;
             const el = global.activeElement;
             e.preventDefault();
             e.stopPropagation();
-            toggleFullscreen(el === Iframe || Iframe.contentDocument.contains(el) ? Iframe : /*el === console.container || console.container.contains(el) ? console.container :*/ _$("tabs"));
+            toggleFullscreen(el === Iframe || Iframe.contentDocument.contains(el) ? Iframe : $_("tabs"));
         }
     }
 
@@ -926,17 +926,17 @@ const root = window;
                 { div: { class: "toolbar-item unfold", id: `${_id}unfoldAllButton`, data: { title: Locale.titleUnfoldAllButton }, onclick: () => editor.execCommand("unfoldall") }},
                 { div: { class: "toolbar-item search", id: `${_id}searchButton`, data: { title: Locale.titleSearchButton }, onclick: () => editor.execCommand("find") }},
                 { div: { class: "toolbar-item replace", id: `${_id}replaceButton`, data: { title: Locale.titleReplaceButton }, onclick: () => editor.execCommand("replace") }}
-            ]}, parent: _$(_id + "tools")}
+            ]}, parent: $_(_id + "tools")}
         );
 
         editorTools[__id] = {
-            beautifyButton: _$(`${_id}beautifyButton`),
-            minifyButton: _$(`${_id}minifyButton`),
-            removeCommentsButton: _$(`${_id}removeCommentsButton`),
-            saveButton: _$(`${_id}saveButton`),
-            loadButton: _$(`${_id}loadButton`),
-            undoButton: _$(`${_id}undoButton`),
-            redoButton: _$(`${_id}redoButton`)
+            beautifyButton: $_(`${_id}beautifyButton`),
+            minifyButton: $_(`${_id}minifyButton`),
+            removeCommentsButton: $_(`${_id}removeCommentsButton`),
+            saveButton: $_(`${_id}saveButton`),
+            loadButton: $_(`${_id}loadButton`),
+            undoButton: $_(`${_id}undoButton`),
+            redoButton: $_(`${_id}redoButton`)
         };
 
         editor.setTheme("ace/theme/cobalt");
@@ -988,7 +988,6 @@ const root = window;
     }
 
     function updateUI() {
-        contextMenu = new ContextMenu(cMenu);
         addProjectsToContextmenu(cMenu);
         checkDisable();
         updateDatabaseDisplay();
@@ -997,6 +996,10 @@ const root = window;
 
     }
 
+    /**
+     * Import projects from the local file system.
+     * Checks if the file 'creationlist.txt' exists and create a projects list from its content to choose from
+     */
     async function getLocalCreations() {
         const projects = [];
         try {
@@ -1017,41 +1020,69 @@ const root = window;
         } catch(e) {};
     }
 
+    /**
+     * Creates contextmenu entries of all loaded projects to choose from, grouped in 20 projects each
+     * and places it in front of the regular context menu entries
+     * arr = Array with the structure of the regular contextmenu
+     */
     async function addProjectsToContextmenu(arr) {
+
+        // create an array consisting of menu entries that group 20 projects each, followed by the basic contextmenu array
         const menu = await addProjectsToContextArray(arr);
+
+        // Destroy the contextmenu if it already exists, create a new one made of the created array
         contextMenu && contextMenu.destroy();
         contextMenu = new ContextMenu(menu);
-        global.interval2 && clearInterval(global.interval2);
-        global.interval2 = setInterval(() => {
+
+        global.contextmenu_interval && clearInterval(global.contextmenu_interval);
+
+        // wait for the existence of the contextmenu dom object of the active project in order to mark it as active
+        global.contextmenu_interval = setInterval(() => {
             if (Project?.id && $("#cm_" + Project.id)) {
-                clearInterval(global.interval2);
+                clearInterval(global.contextmenu_interval);
                 $(`#cm_${Project.id} i.cm-i`).classList.add("active-menu");
             }
         }, 500);
     }
 
+    /**
+     * Reads the options of the project selection (on top right), creates an array of all found options (projects)
+     * and returns the array it got as argument, containing all projects as menu entries as well
+     *
+     * menuArr = Array with the basic contextmenu entries
+     */
     function addProjectsToContextArray(menuArr = []) {
         return new Promise(resolve => {
             let menu = [];
-            global.interval2 && clearInterval(global.interval2);
-            global.interval2 = setInterval(() => {
+
+            global.contextmenu_interval && clearInterval(global.contextmenu_interval);
+
+            // wait for the existing <option> elements of the projects selection dropdown menu
+            global.contextmenu_interval = setInterval(() => {
                 if (Select?.children.length > 1) {
-                    clearInterval(global.interval2);
+                    clearInterval(global.contextmenu_interval);
+                    // Use only the <option> elements that contain an id (only these are projects) and sort them by name
                     const selection = [...Select.children].filter(e => e.id).sort((a, b) => a.innerHTML.toLowerCase() > b.innerHTML.toLowerCase());
                     if (!selection.length) resolve(menuArr);
                     let s = [...selection];
+                    const length = s.length;
+                    // create menu entries containing a submenu of 20 projects each and add them to the contextmenu array
                     while(s.length) {
                         let start = selection.indexOf(s[0]) + 1;
-                        let index = start + "-" + (s.length < 20 ? selection.length : start + 19);
-                        menu.push(addProjectsSectionToContextmenu(s.splice(0, 20), index));
+                        let index = start + "-" + (s.length < 20 ? length : start + 19);
+                        menu.push(createProjectsSection(s.splice(0, 20), index));
                     }
                     resolve([...menu, ...menuArr]);
                 }
-            }, 1000);
+            }, 500);
         });
     }
 
-    function addProjectsSectionToContextmenu(arr, index) {
+    /**
+     * Creates a menu entry "Projects xx-yy" from the <option> elements of the project selection dropdown menu,
+     * which contains a sub-array with the corresponding project entries.
+     */
+    function createProjectsSection(arr, index) {
         const menu = [Locale.projects + (index ? " " + index : ""), "menu-selection"];
         const entries = [];
         each(arr, (item, index) => {
@@ -1813,7 +1844,7 @@ const root = window;
     function downloadWithCors() {
         const url = new URL(document.getElementById("address").value).href;
         fetch(url, { mode: "cors", headers: { Origin: window.location.origin, Referer: window.location.href }}).then(response => response.text()).then(text => {
-            global.downloadScriptsAndStyles = _$("downloadScriptsAndStyles").checked;
+            global.downloadScriptsAndStyles = $_("downloadScriptsAndStyles").checked;
             upload([[url + (url.endsWith(".html") || url.endsWith(".htm") ? "" : "/index.html"), text]]);
         });
     }
@@ -1887,7 +1918,7 @@ const root = window;
 
         blurContainer();
         showInfo(ZipInfo, parent, closeOnBlur, autofocus);
-        callbacks.length && each(callbacks, ([type, inputId, callback]) =>  type === "radio" ? _$("modal-container").addDelegatedListener("click", "input[type='radio']", callback) : _$(inputId)[type === "button" ? "onclick" : "onchange"] = callback);
+        callbacks.length && each(callbacks, ([type, inputId, callback]) =>  type === "radio" ? $_("modal-container").addDelegatedListener("click", "input[type='radio']", callback) : $_(inputId)[type === "button" ? "onclick" : "onchange"] = callback);
     }
 
     function download(e) {
@@ -2026,7 +2057,7 @@ const root = window;
             });
 
             // If no project was chosen, get out of here.
-            if (!temp.toZip.length) return (_$("create-zip").innerHTML = "");
+            if (!temp.toZip.length) return ($_("create-zip").innerHTML = "");
 
             let totalSize = 0, i = 0, pr = [...temp.toZip];
 
@@ -2057,7 +2088,7 @@ const root = window;
         end += chunk.length;
 
         fileName = temp.chunks.length > 1 ?
-            `Creator_projects_${start}_to_${end}${html ? "_html": ""}${html && json ? "_and" : ""}${json ? "_json" : ""}` :
+            `Creator_projects$_{start}_to$_{end}${html ? "_html": ""}${html && json ? "_and" : ""}${json ? "_json" : ""}` :
             `Creator_` + temp.numProjects + `_projects${html ? "_html": ""}${html && json ? "_and" : ""}${json ? "_json" : ""}`;
 
         // Add all projects to the zip file
@@ -2080,7 +2111,7 @@ const root = window;
         // Now the hard work begins, when JSZip compresses all the stuff.
         zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 }}, function (data) {
             currentFile = data.currentFile ? data.currentFile === "json/" || data.currentFile === "html/" ? `${Locale.creatingFilesInFolder} ${data.currentFile}` : `${Locale.compressingProject} "${data.currentFile.split(".")[0].split("/")[1] || data.currentFile}"` : "";
-            _$("create-zip").innerHTML = `${Locale.buildingZipArchive} ${count + 1} ${Locale.of} ${temp.chunks.length} (${Math.floor(data.percent)} %)<br>${currentFile}`;
+            $_("create-zip").innerHTML = `${Locale.buildingZipArchive} ${count + 1} ${Locale.of} ${temp.chunks.length} (${Math.floor(data.percent)} %)<br>${currentFile}`;
         }).then(content => {
 
             // The zip file is created.
@@ -2094,8 +2125,8 @@ const root = window;
             ) : (
                 // Finished, all projects are processed.
                 temp.chunks = temp.projects = temp.toZip = temp.numProjects = null,
-                _$("create-zip").innerHTML = `${count > 1 ? Locale.zipArchivesHaveBeenCreated.replace(/%num%/, count) : Locale.zipArchiveHasBeenCreated}`,
-                setTimeout(() => _$("create-zip").innerHTML = "", 5000)
+                $_("create-zip").innerHTML = `${count > 1 ? Locale.zipArchivesHaveBeenCreated.replace(/%num%/, count) : Locale.zipArchiveHasBeenCreated}`,
+                setTimeout(() => $_("create-zip").innerHTML = "", 5000)
             );
         });
     }
@@ -2383,7 +2414,7 @@ const root = window;
         $(".active-menu") && $(".active-menu").classList.remove("active-menu");
 
         // set the new active project marker inside the context menu
-        _$("cm_" + project.id) && _$("cm_" + project.id).querySelector("i.cm-i").classList.add("active-menu");
+        $_("cm_" + project.id) && $_("cm_" + project.id).querySelector("i.cm-i").classList.add("active-menu");
     }
 
     function removeProject() {
@@ -2455,7 +2486,7 @@ const root = window;
             Projects[index].size = sizeof(project)
         );
         fields?.includes("name") && (
-            _$("project_" + project.id).textContent = project.name,
+            $_("project_" + project.id).textContent = project.name,
             $("#cm_" + project.id + " span.cm-text").innerHTML = project.name,
             sortSelection()
         );
@@ -2621,6 +2652,7 @@ const root = window;
 
     function editTitle(e) {
         const key = event.type === "mousedown" ? 40 : e.keyCode;
+        if(TitleButton.classList.contains("hide")) show(TitleButton);
         if (event.type === "mousedown") setTimeout(() => Title.onmousedown = null, 500);
         if (!~[8, 13, 27].indexOf(key) && Keys[key].length > 1) return Title.style.color = Title.style.backgroundColor = "";
         if (key === 27) {
@@ -2629,7 +2661,8 @@ const root = window;
         } else if (key === 13) {
             e.preventDefault();
             changeTitle();
-        } else if (TitleButton.classList.contains("hide")) show(TitleButton);
+        }
+        if (key === 16 && Title.style.color) return;
         if (Title.style.color) {
             if (Keys[key].length == 1 || key === 8) Title.innerText = "";
             Title.style.color = Title.style.backgroundColor = "";
