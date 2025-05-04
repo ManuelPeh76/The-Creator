@@ -126,17 +126,13 @@ h1 {
 }
 
 .title-header {
-    display: block;
     width: 80%;
-    margin-bottom: 1vh;
     padding: 0.3vh 0.7vw;
     background: linear-gradient(90deg, #0002 0%, #aaaa 100%);
     border: #848484 0.5px solid;
     border-radius: 1vw;
     font-size: 1vw;
     white-space: nowrap;
-    position: relative;
-    top: -12px;
 }
 
 .title-header span {
@@ -173,7 +169,14 @@ h1 {
     background-color: #123;
 }
 
-.work-container {
+.main-wrapper {
+    display: block;
+    width: 50vw;
+    height: 100vh;
+    border-right: #000 1px solid;
+}
+
+header {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -181,20 +184,30 @@ h1 {
     top: 0;
     left: 0;
     width: 50vw;
+    height: inherit;
+}
+
+.work-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    top: 200px;
+    left: 0;
+    width: 50vw;
     height: 83vh;
     transition: all 400ms;
     z-index: 5;
 }
 
-.work-container h1 {
-    height: 170px;
-    text-align: center;
-    margin: 1rem;
+header h1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.selection {
-    position: absolute;
-    top: 0;
+header h1 img {
+    width: 80%;
 }
 
 .projects-selection {
@@ -1219,31 +1232,18 @@ input.ace-keybindings:active {
 }
 
 .work-container h1 {
-    
+
 }
 
 
-.background-text {
-  position: relative;
-  top: 0;
-  left: 0;
-  width: 50vw;
-  font-size: 6.5vw;
-  color: rgba(0, 34, 64, 0.1);
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  user-select: none;
-  pointer-events: none;
-  animation: glow 6s ease-in-out infinite alternate;
+header h1 img {
+   animation: glow 6s ease-in-out infinite alternate;
 }
 
 @keyframes glow {
-  0% {
-    text-shadow: 0 0 3px rgba(0, 34, 64, 0.3);
-  }
-  100% {
-    text-shadow: 0 0 20px rgba(0, 34, 64, 0.6);
-  }
+      0% { filter: blur(0); opacity: 1; }
+     50% { filter: blur(2px); }
+    100% { filter: blur(3px); opacity: 0.3; }
 }
 
 @keyframes blur {
@@ -1257,19 +1257,39 @@ input.ace-keybindings:active {
   }
 }
 
-.headline {
-  position: absolute;
-  top: 1.1rem;
-  left: 14rem;
-  color: #fff;
-  font-size: 16px;
-  letter-spacing: 0.2rem;
-  z-index: 1;
-  user-select: none;
-  pointer-events: none;
-  animation: blur 6s ease-in-out infinite alternate;
-}
-
 .big {
     font-size: 8.5rem;
+}
+
+/* 1) Farb‑Variablen aus ACE Cobalt */
+:root {
+  --ace-bg:              #002240;
+  --ace-fg:              #FFFFFF;
+  --ace-gutter-bg:       #011e3a;
+  --ace-gutter-fg:       rgb(128,145,160);
+  --ace-print-margin:    #555555;
+  --ace-cursor:          #FFFFFF;
+  --ace-selection:       rgba(179,101,57,0.75);
+  --ace-step:            rgb(127,111,19);
+  --ace-bracket:         rgba(255,255,255,0.15);
+  --ace-active-line:     rgba(0,0,0,0.35);
+  --ace-invisible:       rgba(255,255,255,0.15);
+  --ace-keyword:         #FF9D00;
+  --ace-constant:        #FF628C;
+  --ace-support:         #80FFBB;
+  --ace-support-const:   #EB939A;
+  --ace-fold-bg:         #FF9D00;
+  --ace-support-func:    #FFB054;
+  --ace-storage:         #FFEE80;
+  --ace-entity:          #FFDD00;
+  --ace-string:          #3AD900;
+  --ace-regexp:          #80FFC2;
+  --ace-comment:         #0088FF;
+  --ace-heading-bg:      #001221;
+  --ace-heading-fg:      #C8E4FD;
+  --ace-list-bg:         #130D26;
+  --ace-variable:        #CCCCCC;
+  --ace-lang-var:        #FF80E1;
+  --ace-meta-tag:        #9EFFFF;
+  --ace-indent-guide:    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWNgYGBgYHCLSvkPAAP3AgSDTRd4AAAAAElFTkSuQmCC) right repeat-y;
 }
