@@ -27,31 +27,30 @@
 //(function(root) {
 const root = window;
 
-    String.prototype.parseFunction=function(){ eval(this); }
-    Function.prototype.stringify=function(){for(var e,t=/\s/,n=/\(\)|\[\]|\{\}/,s=new Array,r=this.toString(),i=new RegExp("^s*("+(this.name?this.name+"|":"")+"function)[^)]*\\(").test(r),a="start",g=new Array,h=0;h<r.length;++h){var o=r[h];switch(a){case"start":if(t.test(o)||i&&"("!=o)continue;"("==o?(a="arg",e=h+1):(a="singleArg",e=h);break;case"arg":case"singleArg":if(g.length>0&&"\\"==g[g.length-1]){g.pop();continue}if(t.test(o))continue;switch(o){case"\\":g.push(o);break;case"]":case"}":case")":if(g.length>0){n.test(g[g.length-1]+o)&&g.pop();continue}if("singleArg"==a)throw"";s.push(r.substring(e,h).trim()),a=i?"body":"arrow";break;case",":if(g.length>0)continue;if("singleArg"==a)throw"";s.push(r.substring(e,h).trim()),e=h+1;break;case">":if(g.length>0)continue;if("="!=r[h-1])continue;if("arg"==a)throw"";s.push(r.substring(e,h-1).trim()),a="body";break;case"{":case"[":case"(":(g.length<1||'"'!=g[g.length-1]&&"'"!=g[g.length-1])&&g.push(o);break;case'"':g.length<1?g.push(o):'"'==g[g.length-1]&&g.pop();break;case"'":g.length<1?g.push(o):"'"==g[g.length-1]&&g.pop()}break;case"arrow":if(t.test(o))continue;if("="!=o)throw"";if(">"!=r[++h])throw"";a="body";break;case"body":if(t.test(o))continue;r=r.substring(h),h=(r="{"==o?r.replace(/^{\s*(.*)\s*}\s*$/,"$1"):"return "+r.trim()).length;break;default:throw""}}return s=JSON.stringify(s),(i?`function ${this.name}`:`var ${this.name} = `)+`(${s.substring(1,s.length-1).replace(/"/g,"")})`+(i?"":" => ")+`${r}`};
     EventTarget.prototype.addDelegatedListener=function(t,s,l){this.addEventListener(t,function(e){e.target&&e.target.matches(s)&&l.call(e.target,e)})};
 
     /*
      * Init
      */
     addEventListener("load", function() {
+
         addScript([
-            //"console",   				// -> console
-            "https://cdnjs.cloudflare.com/ajax/libs/eruda/3.4.1/eruda.min",
-            "jquery.1.12.4.min",		// -> jQuery, $
-            "jquery.ui.custom",			// -> jQuery.tab
-            "locales",					// -> locale
-            "tag",						// -> tag, each
-            "ace/ace",		            // -> ace
-            "ace/ext-language_tools",
-            "ace/modes",                // -> ace
-            "ace/themes",
-            "ace/workers",
-            "beautifier",				// -> beautifier
-            "html-minifier-terser",     // -> minifier
-            "jszip.min",				// -> JsZip
-            "contextmenu",              // -> ContextMenu
-            "sizeof"                    // -> getSize
+            "https://cdnjs.cloudflare.com/ajax/libs/eruda/3.4.1/eruda.min",   // -> Eruda Console
+            "jquery.1.12.4.min",		                                      // -> jQuery
+            "jquery.ui.custom",			                                      // -> jQuery.tabs()
+            "locales",					                                      // -> Localisation
+            "tag",						                                      // -> tag and each function
+            "ace/ace",		                                                  // -> Ace Editor
+            "ace/ext-language_tools",                                         //    "
+            "ace/modes",                                                      //    "
+            "ace/themes",                                                     //    "
+            "ace/workers",                                                    //    "
+            "beautifier",				                                      // -> Beautifier
+            "html-minifier-terser",                                           // -> Minifier
+            "jszip.min",				                                      // -> JsZip
+            "contextmenu",                                                    // -> ContextMenu
+            "sizeof",                                                         // -> Get the necessary size of any content, if it would be saved/downloaded as a file
+            "strip-comments"                                                  // -> Comment remover for html, js, css and more...
 
         ], function() {
 
@@ -65,15 +64,6 @@ const root = window;
             store = root.localStorage && useDatabase ? root.localStorage : scriptStore;
 
             Locale = params.locale && locale.available.includes(params.locale) ? locale.set(params.locale) : locale.set();
-
-            /**
-             @ Contextmenu
-             *
-             * @param  {string}     item
-             * @param  {attribute}  class
-             * @param  {array}      submenu
-             * @return {Element}    The DOM representation of the contextmenu
-             */
 
             cMenu = [
                 [Locale.project, "menu-project", [
@@ -118,7 +108,7 @@ const root = window;
                             { div: { id: "create-zip", class: "create-zip full-width"}}
                         ]}},
                         { h1: { children: [{ img: { src: "img/bg.png" }}]}},
-                        
+
                         { div: { class: "title-header", children: [
                             { span: { class: "right", text: Locale.project + ":" }},
                             { div: { onclick: focusTitle, id: "title", class: "title", title: Locale.clickToChange, style: { cursor: "pointer" }, text: Locale.unnamedProject }},
@@ -352,232 +342,6 @@ const root = window;
     /*
      * Constants
      */
-
-     /*!
-      * strip-comments <https://github.com/jonschlinkert/strip-comments>
-      * Copyright (c) 2014-present, Jon Schlinkert.
-      * Released under the MIT License.
-      */
-    const strip = (function() {
-        'use strict';
-        class Node {
-          constructor(node) {
-            this.type = node.type;
-            if (node.value) this.value = node.value;
-            if (node.match) this.match = node.match;
-            this.newline = node.newline || '';
-          }
-          get protected() {
-            return Boolean(this.match) && this.match[1] === '!';
-          }
-        }
-        class Block extends Node {
-          constructor(node) {
-            super(node);
-            this.nodes = node.nodes || [];
-          }
-          push(node) {
-            this.nodes.push(node);
-          }
-          get protected() {
-            return this.nodes.length > 0 && this.nodes[0].protected === true;
-          }
-        }
-        const languages = {
-            ada: { LINE_REGEX: /^--.*/ },
-            apl: { LINE_REGEX: /^⍝.*/ },
-            applescript: { BLOCK_OPEN_REGEX: /^\(\*/, BLOCK_CLOSE_REGEX: /^\*\)/ },
-            csharp: { LINE_REGEX: /^\/\/.*/ },
-            haskell: { BLOCK_OPEN_REGEX: /^\{-/, BLOCK_CLOSE_REGEX: /^-\}/, LINE_REGEX: /^--.*/ },
-            html: { BLOCK_OPEN_REGEX: /^\n*<!--(?!-?>)/, BLOCK_CLOSE_REGEX: /^(?<!(?:<!-))-->/, BLOCK_CLOSE_LOOSE_REGEX: /^(?<!(?:<!-))--\s*>/, BLOCK_CLOSE_STRICT_NEWLINE_REGEX: /^(?<!(?:<!-))-->(\s*\n+|\n*)/, BLOCK_CLOSE_STRICT_LOOSE_REGEX: /^(?<!(?:<!-))--\s*>(\s*\n+|\n*)/ },
-            javascript: { BLOCK_OPEN_REGEX: /^\/\*\*?(!?)/, BLOCK_CLOSE_REGEX: /^\*\/(\n?)/, LINE_REGEX: /^\/\/(!?).*/ },
-            lua: { BLOCK_OPEN_REGEX: /^--\[\[/, BLOCK_CLOSE_REGEX: /^\]\]/, LINE_REGEX: /^--.*/ },
-            matlab: { BLOCK_OPEN_REGEX: /^%{/, BLOCK_CLOSE_REGEX: /^%}/, LINE_REGEX: /^%.*/ },
-            perl: { LINE_REGEX: /^#.*/ },
-            php: { BLOCK_OPEN_REGEX: /^\/\*\*?(!?)/, BLOCK_CLOSE_REGEX: /^\*\/(\n?)/, LINE_REGEX: /^(#|\/\/).*?(?=\?>|\n)/ },
-            python: { BLOCK_OPEN_REGEX: /^"""/, BLOCK_CLOSE_REGEX: /^"""/, LINE_REGEX: /^#.*/ },
-            ruby: { BLOCK_OPEN_REGEX: /^=begin/, BLOCK_CLOSE_REGEX: /^=end/, LINE_REGEX: /^#.*/ },
-            shebang: { LINE_REGEX: /^#!.*/ },
-            hashbang: { LINE_REGEX: /^#!.*/ },
-            c: { BLOCK_OPEN_REGEX: /^\/\*\*?(!?)/, BLOCK_CLOSE_REGEX: /^\*\/(\n?)/, LINE_REGEX: /^\/\/(!?).*/ },
-            csharp: { BLOCK_OPEN_REGEX: /^\/\*\*?(!?)/, BLOCK_CLOSE_REGEX: /^\*\/(\n?)/, LINE_REGEX: /^\/\/(!?).*/ },
-            css: { BLOCK_OPEN_REGEX: /^\/\*\*?(!?)/, BLOCK_CLOSE_REGEX: /^\*\/(\n?)/, LINE_REGEX: /^\/\/(!?).*/ },
-            java: { BLOCK_OPEN_REGEX: /^\/\*\*?(!?)/, BLOCK_CLOSE_REGEX: /^\*\/(\n?)/, LINE_REGEX: /^\/\/(!?).*/ },
-            js: { BLOCK_OPEN_REGEX: /^\/\*\*?(!?)/, BLOCK_CLOSE_REGEX: /^\*\/(\n?)/, LINE_REGEX: /^\/\/(!?).*/ },
-            less: { BLOCK_OPEN_REGEX: /^\/\*\*?(!?)/, BLOCK_CLOSE_REGEX: /^\*\/(\n?)/, LINE_REGEX: /^\/\/(!?).*/ },
-            pascal: { BLOCK_OPEN_REGEX: /^\(\*/, BLOCK_CLOSE_REGEX: /^\*\)/ },
-            ocaml: { BLOCK_OPEN_REGEX: /^\(\*/, BLOCK_CLOSE_REGEX: /^\*\)/ },
-            sass: { BLOCK_OPEN_REGEX: /^\/\*\*?(!?)/, BLOCK_CLOSE_REGEX: /^\*\/(\n?)/, LINE_REGEX: /^\/\/(!?).*/ },
-            sql: { LINE_REGEX: /^--.*/ },
-            swift: { BLOCK_OPEN_REGEX: /^\/\*\*?(!?)/, BLOCK_CLOSE_REGEX: /^\*\/(\n?)/, LINE_REGEX: /^\/\/(!?).*/ },
-            ts: { BLOCK_OPEN_REGEX: /^\/\*\*?(!?)/, BLOCK_CLOSE_REGEX: /^\*\/(\n?)/, LINE_REGEX: /^\/\/(!?).*/ },
-            typscript: { BLOCK_OPEN_REGEX: /^\/\*\*?(!?)/, BLOCK_CLOSE_REGEX: /^\*\/(\n?)/, LINE_REGEX: /^\/\/(!?).*/ },
-            xml: { BLOCK_OPEN_REGEX: /^\n*<!--(?!-?>)/, BLOCK_CLOSE_REGEX: /^(?<!(?:<!-))-->/, BLOCK_CLOSE_LOOSE_REGEX: /^(?<!(?:<!-))--\s*>/, BLOCK_CLOSE_STRICT_NEWLINE_REGEX: /^(?<!(?:<!-))-->(\s*\n+|\n*)/, BLOCK_CLOSE_STRICT_LOOSE_REGEX: /^(?<!(?:<!-))--\s*>(\s*\n+|\n*)/ }
-        };
-
-        const constants = {
-          ESCAPED_CHAR_REGEX: /^\\./,
-          QUOTED_STRING_REGEX: /^(['"`])((?:\\.|[^\1])+?)(\1)/,
-          NEWLINE_REGEX: /^\r*\n/
-        };
-
-        const parse = (input, options = {}) => {
-          if (typeof input !== 'string') throw new TypeError('Expected input to be a string');
-          const cst = new Block({ type: 'root', nodes: [] });
-          const stack = [cst];
-          const name = (options.language || 'javascript').toLowerCase();
-          const lang = languages[name];
-          if (typeof lang === 'undefined') throw new Error(`Language "${name}" is not supported by strip-comments`);
-          const { LINE_REGEX, BLOCK_OPEN_REGEX, BLOCK_CLOSE_REGEX } = lang;
-          let block = cst;
-          let remaining = input;
-          let token;
-          let prev;
-          const source = [BLOCK_OPEN_REGEX, BLOCK_CLOSE_REGEX].filter(Boolean);
-          let tripleQuotes = false;
-          if (source.every(regex => regex.source === '^"""')) tripleQuotes = true;
-          const consume = (value = remaining[0] || '') => {
-            remaining = remaining.slice(value.length);
-            return value;
-          };
-          const scan = (regex, type = 'text') => {
-            const match = regex.exec(remaining);
-            if (match) {
-              consume(match[0]);
-              return { type, value: match[0], match };
-            }
-          };
-          const push = node => {
-            if (prev && prev.type === 'text' && node.type === 'text') {
-              prev.value += node.value;
-              return;
-            }
-            block.push(node);
-            if (node.nodes) {
-              stack.push(node);
-              block = node;
-            }
-            prev = node;
-          };
-          const pop = () => {
-            if (block.type === 'root') throw new SyntaxError('Unclosed block comment');
-            stack.pop();
-            block = stack[stack.length - 1];
-          };
-          while (remaining !== '') {
-            // escaped characters
-            if ((token = scan(constants.ESCAPED_CHAR_REGEX, 'text'))) {
-              push(new Node(token));
-              continue;
-            }
-            if (block.type !== 'block' && (!prev || !/\w$/.test(prev.value)) && !(tripleQuotes && remaining.startsWith('"""'))) {
-              if ((token = scan(constants.QUOTED_STRING_REGEX, 'text'))) {
-                push(new Node(token));
-                continue;
-              }
-            }
-            if ((token = scan(constants.NEWLINE_REGEX, 'newline'))) {
-              push(new Node(token));
-              continue;
-            }
-            if (BLOCK_OPEN_REGEX && options.block && !(tripleQuotes && block.type === 'block')) {
-              if ((token = scan(BLOCK_OPEN_REGEX, 'open'))) {
-                push(new Block({ type: 'block' }));
-                push(new Node(token));
-                continue;
-              }
-            }
-            if (BLOCK_CLOSE_REGEX && block.type === 'block' && options.block) {
-              if ((token = scan(BLOCK_CLOSE_REGEX, 'close'))) {
-                token.newline = token.match[1] || '';
-                push(new Node(token));
-                pop();
-                continue;
-              }
-            }
-            if (LINE_REGEX && block.type !== 'block' && options.line) {
-              if ((token = scan(LINE_REGEX, 'line'))) {
-                push(new Node(token));
-                continue;
-              }
-            }
-            if ((token = scan(/^[a-zABD-Z0-9\t ]+/, 'text'))) {
-              push(new Node(token));
-              continue;
-            }
-            push(new Node({ type: 'text', value: consume(remaining[0]) }));
-          }
-          return cst;
-        };
-        const compile = (cst, options = {}) => {
-          const keepProtected = options.safe === true || options.keepProtected === true;
-          let firstSeen = false;
-          const walk = (node, parent) => {
-            let output = '';
-            let inner;
-            let lines;
-            for (const child of node.nodes) {
-              switch (child.type) {
-                case 'block':
-                  if (options.first && firstSeen === true) {
-                    output += walk(child, node);
-                    break;
-                  }
-                  if (options.preserveNewlines === true) {
-                    inner = walk(child, node);
-                    lines = inner.split('\n');
-                    output += '\n'.repeat(lines.length - 1);
-                    break;
-                  }
-                  if (keepProtected === true && child.protected === true) {
-                    output += walk(child, node);
-                    break;
-                  }
-                  firstSeen = true;
-                  break;
-                case 'line':
-                  if (options.first && firstSeen === true) {
-                    output += child.value;
-                    break;
-                  }
-                  if (keepProtected === true && child.protected === true) {
-                    output += child.value;
-                  }
-                  firstSeen = true;
-                  break;
-                case 'open':
-                case 'close':
-                case 'text':
-                case 'newline':
-                default: {
-                  output += child.value || '';
-                  break;
-                }
-              }
-            }
-            return output;
-          };
-          return walk(cst);
-        };
-        const strip = (input, options) => {
-          const opts = { ...options, block: true, line: true };
-          return compile(parse(input, opts), opts);
-        };
-        strip.block = (input, options) => {
-          const opts = { ...options, block: true };
-          return compile(parse(input, opts), opts);
-        };
-        strip.line = (input, options) => {
-          const opts = { ...options, line: true };
-          return compile(parse(input, opts), opts);
-        };
-        strip.first = (input, options) => {
-          const opts = { ...options, block: true, line: true, first: true };
-          return compile(parse(input, opts), opts);
-        };
-        strip.parse = parse;
-        return strip;
-    })();
 
     const editors               = [];
     const databaseTable         = [];

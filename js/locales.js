@@ -80,6 +80,7 @@
 			none2: "nichts",
 			notEditedJet: "noch nicht bearbeitet",
 			nothingToRemove: "Es ist nichts zum Entfernen vorhanden",
+			noLanguageToRemove: "Es sind keine Sprach-Daten zum Entfernen vorhanden.<br><br>Hinweis: Du kannst nur Sprachen entfernen, die du selbst hinzugefügt hast.",
 			numberDaysAgo: "vor {{days}} Tagen",
 			of: "von",
 			ok: "Ok",
@@ -253,6 +254,7 @@
 			none2: "none",
 			notEditedJet: "not edited jet",
 			nothingToRemove: "Nothing to remove",
+			noLanguageToRemove: "There is no language data available to remove.<br><br>Note: You can only remove languages ​​that you added yourself.",
 			numberDaysAgo: "{{days}} days ago",
 			of: "of",
 			ok: "Ok",
@@ -487,18 +489,20 @@
 			});
 		},
 		showRemovable(active) {
-			active = active || locale.active;
-			const lang = locales[active];
 			return new Promise(res => {
+				active = active || locale.active;
+				const lang = locales[active];
+				let list, l, ok;
 				resolve = res;
-				let list = `
+				list = `
 				<div class='language-container'>
 					<h1>${lang.removeLanguage}</h1>
 					<br>`;
-				if(root.localStorage && root.localStorage.creator_locals) {
-					const l = JSON.parse(root.localStorage.creator_locals);
+				if(root.localStorage && localStorage.creator_locals) {
+					l = JSON.parse(localStorage.creator_locals);
 
 					if (l.languages && Object.keys(l.languages).length) {
+						ok = 1;
 						Object.keys(l.languages).forEach(key => {
 					   		list += `
 		   			<div style="margin: 4px; padding: 15px;">${key}
@@ -511,24 +515,24 @@
 					<input type='button' id='add-lang' value='${lang.remove}'>
 					<input type='button' id='add-lang-cancel' value='${lang.cancel}'>
 				</div>`;
-					} else {
-						list += `
-					<div style='margin: 4px;'>${lang.nothingToRemove}</div>
-				<div class='add-lang-buttons flex-space-evenly'>
-					<input type='button' id='add-lang-cancel' value='${lang.cancel}'>
-				</div>`;
 					}
-					div.innerHTML = list;
-	 			    div.style.display = "block";
-	 			    div.style.opacity = 1;
-	 			    if (list.split("type='button'").length === 3) document.querySelector("#add-lang").onclick = processLanguageRemoveForm;
-	 			    document.querySelector("#add-lang-cancel").onclick = cancelLanguageForm;
-					l.additions && l.additions.forEach(({ loc, obj }) => {
-						for(key in obj) {
-							locales[key][loc] = obj[key];
-						}
-					});
 				}
+				ok || (list += `
+			   <div style='margin: 4px;'>${lang.noLanguageToRemove}</div>
+			   <div class='add-lang-buttons flex-space-evenly'>
+				   <input type='button' id='add-lang-cancel' value='${lang.cancel}'>
+			   </div>`
+		   		);
+				div.innerHTML = list;
+				div.style.display = "block";
+				div.style.opacity = 1;
+				if (list.split("type='button'").length === 3) document.querySelector("#add-lang").onclick = processLanguageRemoveForm;
+				document.querySelector("#add-lang-cancel").onclick = cancelLanguageForm;
+				l?.additions && l.additions.forEach(({ loc, obj }) => {
+					for(key in obj) {
+						locales[key][loc] = obj[key];
+					}
+				});
 			});
 		}
 	};

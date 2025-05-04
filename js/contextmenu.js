@@ -1,3 +1,41 @@
+/**
+ @ Contextmenu
+ *
+ * @param  {string}     item
+ * @param  {attribute}  class
+ * @param  {array}      submenu
+ * @return {Element}    The DOM representation of the contextmenu
+ *
+ *
+ * Created in 2022 by Manuel Pelzer
+ * There is no copyright, use and alter as needed
+ *
+ *
+ * How to use
+ * ==========
+ *
+ * const contextMenu = new ContextMenu([
+ *
+ *   // menu entries:
+ *   [entry name, id, className, title text, callback, action key]],
+ *   [entry2 name, id, className, title text, callback, action key]],
+ *   ["separator"], // Creates a horizontal line between entries
+ *
+ *   // menu entry with submenu:
+ *   [entry3 name, id, [
+
+ *     // submenu array:
+ *     [subentry name, id, className, title text, callback, action key]],
+ *     ...
+ *   ]]
+ * ];
+ *
+ * The callback function of a menu entry will be called, when
+ * the contextmenu is open and the action key of that entry is pressed
+ *
+ */
+
+
 (function(root, factory) {
 
 	root.ContextMenu = factory();
@@ -187,10 +225,9 @@
 	            a.style.right = e.screenX + box.width + subbox.width > innerWidth - 20  ? (box.width - 10) + "px" : "unset";
 	            a.style.bottom = e.y + subbox.height > innerHeight - 20 ? "-10px" : "unset";
 				// Check if a submenu is larger than top or bottom or the screen and correct its position if needed
-				let s = rect(a);
-				(s.top < 0 || s.height + s.top > innerHeight) && (
-					a.style.top    = boxHeight ? "unset" : `-${s.top}px`,
-					a.style.bottom = boxHeight ? `${s.bottom - innerHeight}px` : "unset"
+				(subbox.top < 0 || subbox.height + subbox.top > innerHeight) && (
+					a.style.top    = boxHeight ? "unset" : `-${subbox.top}px`,
+					a.style.bottom = boxHeight ? `${subbox.bottom - innerHeight}px` : "unset"
 				);
 	        });
 			// ...and finally show the contextmenu
