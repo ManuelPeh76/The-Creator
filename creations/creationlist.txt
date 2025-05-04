@@ -4,5 +4,5 @@
   "/creations/json/JS Fuck.json",
   "/creations/json/JS Fuck Decoder.json",
   "/creations/json/Patternify Flex.json",
-  "/creations/json/sudoku.json"
+  "/creations/json/Sudoku.json"
 ]
