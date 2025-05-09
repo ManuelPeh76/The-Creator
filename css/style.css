@@ -185,6 +185,8 @@ header {
     left: 0;
     width: 50vw;
     height: inherit;
+    border-right: rgba(0, 0, 0, 0.4) 3px solid;
+
 }
 
 .work-container {
