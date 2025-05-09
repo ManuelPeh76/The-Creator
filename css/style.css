@@ -213,6 +213,8 @@ header h1 img {
 }
 
 .projects-selection {
+    position: relative;
+    right: 3px;
     opacity: 0.3;
     width: 10vw;
     margin: 2px;
